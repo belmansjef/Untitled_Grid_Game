@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "Game.h"
+#include <iostream>
 
 #pragma region gameFunctions											
 void Start()
 {
-
+	std::cout << "Hello World!" << std::endl;
 }
 
 void Draw()
