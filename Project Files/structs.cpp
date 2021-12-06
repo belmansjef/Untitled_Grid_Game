@@ -117,55 +117,60 @@ Ellipsef::Ellipsef(const Point2f& center, float radiusX, float radiusY)
 // Cell Constructors
 //-----------------------------------------------------------------
 Cell::Cell()
-	:Cell{-1, Point2f(), true}
+	:Cell{-1, Point2f(), 64.0f, 64.0f, true}
 {
 }
 
-Cell::Cell(const int occupyingCharIndex, const Point2f& cellPos, const bool isValid)
+Cell::Cell(const int occupyingCharIndex, const Point2f& cellPos, const float width, const float height, const bool isValid)
 	: occupyingCharIndex{ occupyingCharIndex }
 	, cellPos{cellPos}
+	, width{width}
+	, height{height}
 	, isValid{isValid}
 {
 }
 
 Character::Character()
-	:Character{ Texture(), 0.0f, 0.0f, 0.0f, 0.0f, false, false }
+	:Character{ Texture(), 0, 0.0f, 0.0f, 0.0f, 0.0f, false, false }
 {
 }
 
-Character::Character(const Texture& charTexture, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isInitialized)
+Character::Character(const Texture& charTexture, const int cellIndex, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isActive)
 	: charTexture{charTexture}
+	, cellIndex{cellIndex}
 	, hp{hp}
 	, maxHP{maxHP}
 	, dmgMultiplier{ dmgMultiplier }
 	, dmg{dmg}
 	, isPlayer{isPlayer}
-	, isInitialized{isInitialized}
+	, isActive{isActive}
 {
 }
 
 Grid::Grid()
-	:Grid{Cell(), 0.0f, 0.0f, 16}
+	:Grid{Cell(), 0.0f, 0.0f, 5.0f, 16}
 {
 }
 
-Grid::Grid(const Cell& gridCells, const float width, const float height, const int size)
-	: gridCells{gridCells}
+Grid::Grid(const Cell& cells, const float width, const float height, const float spacing, const int size)
+	: cells{cells}
 	, width{width}
 	, height{height}
+	, spacing{ spacing }
 	, size{size}
 {
 }
 
 Projectille::Projectille()
-	:Projectille{ Point2f(), 1.0f, 1.0f, 1.0f }
+	:Projectille{ Point2f(), MovementDirection::left, 1.0f, 1.0f, 1.0f }
 {
 }
 
-Projectille::Projectille(const Point2f& pos, const float dmg, const float speed, const float radius)
+Projectille::Projectille(const Point2f& pos, const MovementDirection& moveDir, const float dmg, const float speed, const float size)
 	: pos{pos}
+	, moveDir{moveDir}
 	, dmg{dmg}
-	, speed{speed}
-	, radius{radius}
+	, speed{ speed }
+	, size{ size }
 {
 }

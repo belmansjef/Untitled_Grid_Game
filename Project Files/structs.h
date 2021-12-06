@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
-#include "utils.h"
-using namespace utils;
+
 
 struct Window
 {
@@ -79,13 +78,21 @@ struct Ellipsef
 	float radiusY;
 };
 
+struct Texture
+{
+	GLuint id;
+	float width;
+	float height;
+};
+
 struct Character
 {
 	Character();
-	explicit Character(const Texture& charTexture, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isInitalized);
+	explicit Character(const Texture& charTexture, const int cellIndex, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isActive);
 	
-	bool isInitialized;
+	bool isActive;
 	bool isPlayer;
+	int cellIndex;
 	Texture charTexture;
 	float hp;
 	float maxHP;
@@ -96,31 +103,43 @@ struct Character
 struct Cell
 {
 	Cell();
-	explicit Cell(const int occupyingCharIndex, const Point2f& cellPos, const bool isValid);
+	explicit Cell(const int occupyingCharIndex, const Point2f& cellPos, const float width, const float height, const bool isValid);
 
 	bool isValid;
 	int occupyingCharIndex;
 	Point2f cellPos;
+	float width;
+	float height;
 };
 
 struct Grid
 {
 	Grid();
-	explicit Grid(const Cell& gridCells, const float width, const float height, const int size);
+	explicit Grid(const Cell& cells, const float width, const float height, const float spacing, const int size);
 
 	int size;
-	Cell gridCells[16];
+	Cell cells[16];
 	float width;
 	float height;
+	float spacing;
+};
+
+enum class MovementDirection
+{
+	up,
+	down,
+	left,
+	right
 };
 
 struct Projectille
 {
 	Projectille();
-	explicit Projectille(const Point2f& pos, const float dmg, const float speed, const float radius);
+	explicit Projectille(const Point2f& pos, const MovementDirection& moveDir, const float dmg, const float speed, const float size);
 	
 	Point2f pos;
+	MovementDirection moveDir;
 	float dmg;
 	float speed;
-	float radius;
+	float size;
 };

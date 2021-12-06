@@ -5,6 +5,7 @@
 namespace utils
 {
 
+
 	const float g_Pi{ 3.1415926535f };
 
 #pragma region OpenGLDrawFunctionality
@@ -54,12 +55,7 @@ namespace utils
 
 #pragma region TextureFunctionality
 
-	struct Texture
-	{
-		GLuint id;
-		float width;
-		float height;
-	};
+
 	bool TextureFromFile(const std::string& path, Texture& texture);
 	bool TextureFromString(const std::string& text, TTF_Font* pFont, const Color4f& textColor, Texture& texture);
 	bool TextureFromString(const std::string& text, const std::string& fontPath, int ptSize, const Color4f& textColor, Texture& texture);
