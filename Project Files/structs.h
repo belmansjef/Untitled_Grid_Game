@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include "utils.h"
+using namespace utils;
 
 struct Window
 {
@@ -77,5 +79,35 @@ struct Ellipsef
 	float radiusY;
 };
 
+struct Character
+{
+	Character();
+	explicit Character(const Texture& charTexture, const float hp, const float maxHP, const bool isPlayer, const float dmgMultiplier, const float dmg);
+	Texture charTexture;
+	float hp;
+	float maxHP;
+	bool isPlayer;
+	float dmgMultiplier;
+	float dmg;
+};
+
+struct Cell
+{
+	Cell();
+	explicit Cell(const Character& occupyingChar, const Point2f& cellPos, const bool isValid);
+	Character occupyingChar;
+	Point2f cellPos;
+	bool isValid;
+};
+
+struct Grid
+{
+	Grid();
+	explicit Grid(const Cell& gridCells, const float width, const float height, const int size);
+	int size;
+	Cell gridCells[16];
+	float width;
+	float height;
+};
 
 
