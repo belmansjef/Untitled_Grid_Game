@@ -116,10 +116,19 @@ Ellipsef::Ellipsef(const Point2f& center, float radiusX, float radiusY)
 //-----------------------------------------------------------------
 // Cell Constructors
 //-----------------------------------------------------------------
+Cell::Cell()
+	:Cell{Character(), Point2f(), true}
+{
+}
 Cell::Cell(const Character& occupyingChar, const Point2f& cellPos, const bool isValid)
 	: occupyingChar{occupyingChar}
 	, cellPos{cellPos}
 	, isValid{isValid}
+{
+}
+
+Character::Character()
+	:Character{Texture(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
 {
 }
 
@@ -130,6 +139,11 @@ Character::Character(const Texture& charTexture, const float hp, const float max
 	, isPlayer{ isPlayer }
 	, dmgMultiplier{ dmgMultiplier }
 	, dmg{dmg}
+{
+}
+
+Grid::Grid()
+	:Grid{Cell(), 0.0f, 0.0f, 16}
 {
 }
 
