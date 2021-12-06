@@ -117,28 +117,30 @@ Ellipsef::Ellipsef(const Point2f& center, float radiusX, float radiusY)
 // Cell Constructors
 //-----------------------------------------------------------------
 Cell::Cell()
-	:Cell{Character(), Point2f(), true}
+	:Cell{-1, Point2f(), true}
 {
 }
-Cell::Cell(const Character& occupyingChar, const Point2f& cellPos, const bool isValid)
-	: occupyingChar{occupyingChar}
+
+Cell::Cell(const int occupyingCharIndex, const Point2f& cellPos, const bool isValid)
+	: occupyingCharIndex{ occupyingCharIndex }
 	, cellPos{cellPos}
 	, isValid{isValid}
 {
 }
 
 Character::Character()
-	:Character{Texture(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+	:Character{ Texture(), 0.0f, 0.0f, 0.0f, 0.0f, false, false }
 {
 }
 
-Character::Character(const Texture& charTexture, const float hp, const float maxHP, const bool isPlayer, const float dmgMultiplier, const float dmg)
+Character::Character(const Texture& charTexture, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isInitialized)
 	: charTexture{charTexture}
 	, hp{hp}
 	, maxHP{maxHP}
-	, isPlayer{ isPlayer }
 	, dmgMultiplier{ dmgMultiplier }
 	, dmg{dmg}
+	, isPlayer{isPlayer}
+	, isInitialized{isInitialized}
 {
 }
 
@@ -152,5 +154,18 @@ Grid::Grid(const Cell& gridCells, const float width, const float height, const i
 	, width{width}
 	, height{height}
 	, size{size}
+{
+}
+
+Projectille::Projectille()
+	:Projectille{ Point2f(), 1.0f, 1.0f, 1.0f }
+{
+}
+
+Projectille::Projectille(const Point2f& pos, const float dmg, const float speed, const float radius)
+	: pos{pos}
+	, dmg{dmg}
+	, speed{speed}
+	, radius{radius}
 {
 }

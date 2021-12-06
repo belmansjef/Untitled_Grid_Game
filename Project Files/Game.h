@@ -3,13 +3,24 @@ using namespace utils;
 #pragma region gameInformation
 std::string g_WindowTitle{ "Untitled Grid Game - Arno - Jef - 1DAE21" };
 
-float g_WindowWidth{ 500 };
-float g_WindowHeight{ 300 };
+float g_WindowWidth{ 1280 };
+float g_WindowHeight{ 720 };
 #pragma endregion gameInformation
 
 
 #pragma region ownDeclarations
+Grid g_PlayerGird{};
+Grid g_EnemyGrid{};
 
+const int g_NrEnemies{ 16 };
+Character g_Player{};
+Character g_Enemies[g_NrEnemies]{};
+
+void InitPlayerGrid(Grid* pPlayerGrid);
+void InitEnemyGrid(Grid* pEnemyGrid);
+
+void InitPlayer(Character& player);
+void InitEnemies(Character* pEnemies, const int size);
 #pragma endregion ownDeclarations
 
 #pragma region gameFunctions											

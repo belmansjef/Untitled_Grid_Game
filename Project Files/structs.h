@@ -82,11 +82,13 @@ struct Ellipsef
 struct Character
 {
 	Character();
-	explicit Character(const Texture& charTexture, const float hp, const float maxHP, const bool isPlayer, const float dmgMultiplier, const float dmg);
+	explicit Character(const Texture& charTexture, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isInitalized);
+	
+	bool isInitialized;
+	bool isPlayer;
 	Texture charTexture;
 	float hp;
 	float maxHP;
-	bool isPlayer;
 	float dmgMultiplier;
 	float dmg;
 };
@@ -94,20 +96,31 @@ struct Character
 struct Cell
 {
 	Cell();
-	explicit Cell(const Character& occupyingChar, const Point2f& cellPos, const bool isValid);
-	Character occupyingChar;
-	Point2f cellPos;
+	explicit Cell(const int occupyingCharIndex, const Point2f& cellPos, const bool isValid);
+
 	bool isValid;
+	int occupyingCharIndex;
+	Point2f cellPos;
 };
 
 struct Grid
 {
 	Grid();
 	explicit Grid(const Cell& gridCells, const float width, const float height, const int size);
+
 	int size;
 	Cell gridCells[16];
 	float width;
 	float height;
 };
 
-
+struct Projectille
+{
+	Projectille();
+	explicit Projectille(const Point2f& pos, const float dmg, const float speed, const float radius);
+	
+	Point2f pos;
+	float dmg;
+	float speed;
+	float radius;
+};
