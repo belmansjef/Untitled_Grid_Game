@@ -21,22 +21,21 @@ const int g_NrEnemies{ 16 };
 Character g_Player{};
 Character g_Enemies[g_NrEnemies]{};
 
-void InitPlayerGrid(Grid& playerGrid);
-void InitEnemyGrid(Grid& enemyGrid);
+void InitPlayer(Character& player, Grid& grid);
+void InitEnemies(Character* pEnemies, const int size, Grid& grid);
 
-void InitPlayer(Character& player);
-void InitEnemies(Character* pEnemies, const int size);
+void InitGrid(Grid& grid, const Point2f& startPos);
 
-void MovePlayer(Character& player, MovementDirection moveDir);
-void MoveEnemy(Character& enemy, MovementDirection moveDir);
+void MoveCharacter(Character& character, const Grid& grid, MovementDirection moveDir);
+
+void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
+void HitCharacter(Character& character, const float dmg);
+void KillCharacter(Character& character, Grid& grid);
 
 void UpdateEnemies(Character* pEnemies, const int size);
-void SpawnEnemies(Character* pEnemies, const int size, const int emeniesToSpawn);
 
+void DrawGridCharacters(Grid& grid);
 void DrawGrid(Grid& grid);
-
-void DrawPlayer(Character& player);
-void DrawEnemies(Grid& enemyGrid);
 #pragma endregion ownDeclarations
 
 #pragma region gameFunctions			

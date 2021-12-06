@@ -114,41 +114,41 @@ Ellipsef::Ellipsef(const Point2f& center, float radiusX, float radiusY)
 }
 
 //-----------------------------------------------------------------
-// Cell Constructors
+// Grid game Constructors
 //-----------------------------------------------------------------
-Cell::Cell()
-	:Cell{-1, Point2f(), 64.0f, 64.0f, true}
+Character::Character()
+	:Character{ Texture(), Texture(), 100.0f, 100.0f, 100.0f, 1.0f, false, false }
 {
 }
 
-Cell::Cell(const int occupyingCharIndex, const Point2f& cellPos, const float width, const float height, const bool isValid)
-	: occupyingCharIndex{ occupyingCharIndex }
+Character::Character(const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive)
+	: characterTexture{ characterTexture }
+	, healthTexture{ healthTexture }
+	, hp{ hp }
+	, maxHP{ maxHP }
+	, dmg{ dmg }
+	, dmgMultiplier{ dmgMultiplier }
+	, isPlayer{ isPlayer }
+	, isAlive{ isAlive }
+{
+}
+
+Cell::Cell()
+	:Cell{new Character(), Point2f(), 64.0f, 64.0f, true}
+{
+}
+
+Cell::Cell(Character* occupyingCharacter, const Point2f& cellPos, const float width, const float height, const bool isWalkable)
+	: pCharacter{ occupyingCharacter }
 	, cellPos{cellPos}
 	, width{width}
 	, height{height}
-	, isValid{isValid}
-{
-}
-
-Character::Character()
-	:Character{ Texture(), 0, 0.0f, 0.0f, 0.0f, 0.0f, false, false }
-{
-}
-
-Character::Character(const Texture& charTexture, const int cellIndex, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isActive)
-	: charTexture{charTexture}
-	, cellIndex{cellIndex}
-	, hp{hp}
-	, maxHP{maxHP}
-	, dmgMultiplier{ dmgMultiplier }
-	, dmg{dmg}
-	, isPlayer{isPlayer}
-	, isActive{isActive}
+	, isWalkable{isWalkable}
 {
 }
 
 Grid::Grid()
-	:Grid{Cell(), 0.0f, 0.0f, 5.0f, 16}
+	:Grid{Cell(), 424.0f, 424.0f, 10.0f, 16}
 {
 }
 

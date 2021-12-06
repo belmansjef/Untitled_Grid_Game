@@ -88,26 +88,31 @@ struct Texture
 struct Character
 {
 	Character();
-	explicit Character(const Texture& charTexture, const int cellIndex, const float hp, const float maxHP, const float dmgMultiplier, const float dmg, const bool isPlayer, const bool isActive);
+	explicit Character(const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive);
 	
-	bool isActive;
+	Texture characterTexture;
+	Texture healthTexture;
+
+	bool isAlive;
 	bool isPlayer;
-	int cellIndex;
-	Texture charTexture;
+
 	float hp;
 	float maxHP;
-	float dmgMultiplier;
+
 	float dmg;
+	float dmgMultiplier;
 };
 
 struct Cell
 {
 	Cell();
-	explicit Cell(const int occupyingCharIndex, const Point2f& cellPos, const float width, const float height, const bool isValid);
+	explicit Cell(Character* occupyingCharacter, const Point2f& cellPos, const float width, const float height, const bool isWalkable);
 
-	bool isValid;
-	int occupyingCharIndex;
+	Character* pCharacter;
+
 	Point2f cellPos;
+	bool isWalkable;
+
 	float width;
 	float height;
 };
@@ -117,8 +122,9 @@ struct Grid
 	Grid();
 	explicit Grid(const Cell& cells, const float width, const float height, const float spacing, const int size);
 
-	int size;
 	Cell cells[16];
+	int size;
+
 	float width;
 	float height;
 	float spacing;

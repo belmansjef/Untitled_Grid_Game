@@ -1,17 +1,30 @@
 #include "pch.h"
 #include "Game.h"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #pragma region gameFunctions
 void Start()
 {
-	InitPlayerGrid(g_PlayerGrid);
+	InitPlayer(g_Player, g_PlayerGrid);
+	InitEnemies(g_Enemies, g_NrEnemies, g_EnemyGrid);
+
+	// Spawn the player
+	SpawnCharacter(g_Player, g_PlayerGrid);
+
+	// Example of spawning two enemies
+	for (int i = 0; i < 3; i++)
+	{
+		SpawnCharacter(g_Enemies[i], g_EnemyGrid);
+	}
 }
 
 void Draw()
 {
-	ClearBackground(0.0f, 0.0f, 0.0f);
+	ClearBackground(0.5f, 0.0f, 0.7f);
 	DrawGrid(g_PlayerGrid);
+	DrawGrid(g_EnemyGrid);
 }
 
 void Update(float elapsedSec)
@@ -55,39 +68,64 @@ void OnMouseUpEvent(const SDL_MouseButtonEvent& e)
 #pragma endregion inputHandling
 
 #pragma region ownDefinitions
-void InitPlayerGrid(Grid& playerGrid)
+void InitPlayer(Character& player, Grid& grid)
 {
-	const Point2f startPos{ 20.0f, g_WindowHeight / 3.0f };
-	const float cellSize{ 64.0f };
+	player.dmg = 100.0f;
+	player.dmgMultiplier = 1.0f;
+	player.maxHP = player.hp = 500.0f;
+	player.isPlayer = true;
+	player.isAlive = true;
+
+	std::stringstream stream{};
+	stream << std::fixed << std::setprecision(0) << player.maxHP;
+	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), player.healthTexture);
+
+	const Point2f startPos{ (g_WindowWidth / 2.0f) - (grid.width + 25.0f), (g_WindowHeight - grid.height) / 2.0f };
+	InitGrid(grid, startPos);
+}
+
+void InitEnemies(Character* pEnemies, const int size, Grid& grid)
+{
+	for (int i = 0; i < size; i++)
+	{
+		pEnemies[i].dmg = 50.0f;
+		pEnemies[i].dmgMultiplier = 1.0f;
+		pEnemies[i].maxHP = pEnemies[i].hp = 500.0f;
+		pEnemies[i].isPlayer = false;
+		pEnemies[i].isAlive = false;
+
+		std::stringstream stream{};
+		stream << std::fixed << std::setprecision(0) << pEnemies[i].maxHP;
+		TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pEnemies[i].healthTexture);
+	}
+
+	const Point2f startPos{ (g_WindowWidth / 2.0f) + 25.0f, (g_WindowHeight - grid.height) / 2.0f };
+	InitGrid(grid, startPos);
+}
+
+void InitGrid(Grid& grid, const Point2f& startPos)
+{
+	const float cellSize{ 96.0f };
 	const float spacing{ 10.0f };
 
-	playerGrid.size = 16;
-	playerGrid.width = (cellSize + spacing) * 4;
-	playerGrid.height = (cellSize + spacing) * 4;
-	playerGrid.spacing = spacing;
+	grid.size = 16;
+	grid.width = (cellSize + spacing) * 4;
+	grid.height = (cellSize + spacing) * 4;
+	grid.spacing = spacing;
 
-	for (int i = 0; i < playerGrid.size; i++)
+	for (int i = 0; i < grid.size; i++)
 	{
-		playerGrid.cells[i].cellPos.x = startPos.x + ((cellSize + spacing) * (i % 4));
-		playerGrid.cells[i].cellPos.y = startPos.y + ((cellSize + spacing) * (i / 4));
-		playerGrid.cells[i].width = playerGrid.cells[i].height = cellSize;
+		grid.cells[i].cellPos.x = startPos.x + ((cellSize + spacing) * (i % 4));
+		grid.cells[i].cellPos.y = startPos.y + ((cellSize + spacing) * (i / 4));
+		grid.cells[i].width = grid.cells[i].height = cellSize;
 	}
 }
-void InitEnemyGrid(Grid* pEnemyGrid)
+
+void MoveCharacter(Character& player, const Grid& grid, MovementDirection moveDir)
 {
+
 }
-void InitPlayer(Character& player)
-{
-}
-void InitEnemies(Character* pEnemies, const int size)
-{
-}
-void MovePlayer(Character& player, MovementDirection moveDir)
-{
-}
-void MoveEnemy(Character& enemy, MovementDirection moveDir)
-{
-}
+
 void UpdateEnemies(Character* pEnemies, const int size)
 {
 	if (g_UpdateTimer >= g_EnemyUpdateInterval)
@@ -96,21 +134,80 @@ void UpdateEnemies(Character* pEnemies, const int size)
 		g_UpdateTimer = 0.0f;
 	}
 }
-void SpawnEnemies(Character* pEnemies, const int size, const int emeniesToSpawn)
+
+void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 {
+	if (randomSpawn)
+	{
+		int index{ int(GenerateRandomNumber(0, grid.size - 1)) };
+		while (grid.cells[index].pCharacter->isAlive)
+		{
+			index = int(GenerateRandomNumber(0, grid.size - 1));
+		}
+
+		grid.cells[index].pCharacter = &character;
+		character.isAlive = true;
+		return;
+	}
+	else
+	{
+		for (int i = 0; i < grid.size; i++)
+		{
+			if (!grid.cells[i].pCharacter->isAlive)
+			{
+				grid.cells[i].pCharacter = &character;
+				character.isAlive = true;
+				return;
+			}
+		}
+	}
+	
+	std::cout << "Unable to spawn character" << std::endl;
 }
+
+void HitCharacter(Character& character, const float dmg)
+{
+
+}
+
+void KillCharacter(Character& character, Grid& grid)
+{
+
+}
+
+void DrawGridCharacters(Grid& grid)
+{
+	for (int i = 0; i < grid.size; i++)
+	{
+		if (grid.cells[i].pCharacter->isAlive)
+		{
+			if (grid.cells[i].pCharacter->isPlayer)
+			{
+				SetColor(0.2f, 1.0f, 0.2f);
+			}
+			else
+			{
+				SetColor(1.0f, 0.2f, 0.2f);
+			}
+
+			FillRect(grid.cells[i].cellPos.x + 8.0f, grid.cells[i].cellPos.y + 8.0f, grid.cells[i].width - 16.0f, grid.cells[i].height - 16.0f);
+			const Point2f textPos{grid.cells[i].cellPos.x + ((grid.cells[i].width / 2.0f) - (grid.cells[i].pCharacter->healthTexture.width / 2.0f)), grid.cells[i].cellPos.y + 8.0f};
+			DrawTexture(grid.cells[i].pCharacter->healthTexture, textPos);
+		}
+	}
+}
+
 void DrawGrid(Grid& grid)
 {
 	for (int i = 0; i < grid.size; i++)
 	{
-		SetColor(1.0f, 1.0f, 1.0f);
+		SetColor(0.9f, 0.9f, 0.9f);
 		FillRect(grid.cells[i].cellPos, grid.cells[i].width, grid.cells[i].height);
+
+		SetColor(0.0f, 0.0f, 0.0f);
+		DrawRect(grid.cells[i].cellPos, grid.cells[i].width, grid.cells[i].height, 3.0f);
 	}
-}
-void DrawPlayer(Character& player)
-{
-}
-void DrawEnemies(Grid& enemyGrid)
-{
+
+	DrawGridCharacters(grid);
 }
 #pragma endregion ownDefinitions
