@@ -4,7 +4,7 @@
 #pragma region gameFunctions											
 void Start()
 {
-
+	int number{};
 }
 
 void Draw()
