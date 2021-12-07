@@ -137,40 +137,56 @@ void InitGrid(Grid& grid, const Point2f& startPos)
 	}
 }
 
-void MoveCharacter(Character* player, Grid& grid, MovementDirection moveDir)
+void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 {
 	for (int i = 0; i < grid.size; i++)
 	{
-		if (grid.cells[i].pCharacter == player)
+		if (grid.cells[i].pCharacter == pCharacter)
 		{
 			switch (moveDir)
 			{
 			case MovementDirection::up:
 				if (i < 12)
 				{
-					grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
-					grid.cells[i].pCharacter = nullptr;
+					if (!grid.cells[i + 4].pCharacter->isAlive)
+					{
+						Character* pHoldChar{ grid.cells[i + 4].pCharacter };
+						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = pHoldChar;
+					}
 				}
 				break;
 			case MovementDirection::down:
 				if (i > 3)
 				{
-					grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
-					grid.cells[i].pCharacter = nullptr;
+					if (!grid.cells[i - 4].pCharacter->isAlive)
+					{
+						Character* pHoldChar{ grid.cells[i - 4].pCharacter };
+						grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = pHoldChar;
+					}
 				}
 				break;
 			case MovementDirection::left:
 				if (i % 4 > 0)
 				{
-					grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
-					grid.cells[i].pCharacter = nullptr;
+					if (!grid.cells[i - 1].pCharacter->isAlive)
+					{
+						Character* pHoldChar{ grid.cells[i - 1].pCharacter };
+						grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = pHoldChar;
+					}
 				}
 				break;
 			case MovementDirection::right:
 				if (i % 4 < 3)
 				{
-					grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
-					grid.cells[i].pCharacter = nullptr;
+					if (!grid.cells[i + 1].pCharacter->isAlive)
+					{
+						Character* pHoldChar{ grid.cells[i + 1].pCharacter };
+						grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = pHoldChar;
+					}
 				}
 				break;
 			default:
@@ -185,7 +201,30 @@ void UpdateEnemies(Character* pEnemies, const int size)
 {
 	if (g_UpdateTimer >= g_EnemyUpdateInterval)
 	{
-		// TODO: enemy logic
+		for (int i = 0; i < size; i++)
+		{
+			if (pEnemies[i].isAlive)
+			{
+				MovementDirection randDir{ MovementDirection(rand() % 4) };
+				switch (randDir)
+				{
+				case MovementDirection::up:
+					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::up);
+					break;
+				case MovementDirection::down:
+					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::down);
+					break;
+				case MovementDirection::left:
+					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::left);
+					break;
+				case MovementDirection::right:
+					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::right);
+					break;
+				default:
+					break;
+				}
+			}
+		}
 		g_UpdateTimer = 0.0f;
 	}
 }
