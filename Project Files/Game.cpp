@@ -43,7 +43,23 @@ void End()
 #pragma region inputHandling											
 void OnKeyDownEvent(SDL_Keycode key)
 {
-
+	switch (key)
+	{
+	case SDLK_w:
+		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::up);
+		break;
+	case SDLK_a:
+		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::left );
+		break;
+	case SDLK_s:
+		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::down);
+		break;
+	case SDLK_d:
+		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::right);
+		break;
+	default:
+		break;
+	}
 }
 
 void OnKeyUpEvent(SDL_Keycode key)
@@ -121,9 +137,47 @@ void InitGrid(Grid& grid, const Point2f& startPos)
 	}
 }
 
-void MoveCharacter(Character& player, const Grid& grid, MovementDirection moveDir)
+void MoveCharacter(Character* player, Grid& grid, MovementDirection moveDir)
 {
-
+	for (int i = 0; i < grid.size; i++)
+	{
+		if (grid.cells[i].pCharacter == player)
+		{
+			switch (moveDir)
+			{
+			case MovementDirection::up:
+				if (i < 12)
+				{
+					grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
+					grid.cells[i].pCharacter = nullptr;
+				}
+				break;
+			case MovementDirection::down:
+				if (i > 3)
+				{
+					grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
+					grid.cells[i].pCharacter = nullptr;
+				}
+				break;
+			case MovementDirection::left:
+				if (i % 4 > 0)
+				{
+					grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
+					grid.cells[i].pCharacter = nullptr;
+				}
+				break;
+			case MovementDirection::right:
+				if (i%4 < 3)
+				{
+					grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
+					grid.cells[i].pCharacter = nullptr;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 void UpdateEnemies(Character* pEnemies, const int size)

@@ -26,7 +26,7 @@ void InitEnemies(Character* pEnemies, const int size, Grid& grid);
 
 void InitGrid(Grid& grid, const Point2f& startPos);
 
-void MoveCharacter(Character& character, const Grid& grid, MovementDirection moveDir);
+void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 
 void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
 void HitCharacter(Character& character, const float dmg);
