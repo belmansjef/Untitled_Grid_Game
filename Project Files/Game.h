@@ -9,7 +9,7 @@ float g_WindowHeight{ 720 };
 
 
 #pragma region ownDeclarations
-const float g_EnemyUpdateInterval{ 2.0f };
+const float g_EnemyUpdateInterval{ .5f };
 Point2f g_EnemySpawnInterval{ 2.0f, 30.0f };
 float g_UpdateTimer{};
 float g_SpawnTimer{};

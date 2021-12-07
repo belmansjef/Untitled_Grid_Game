@@ -205,23 +205,26 @@ void UpdateEnemies(Character* pEnemies, const int size)
 		{
 			if (pEnemies[i].isAlive)
 			{
-				MovementDirection randDir{ MovementDirection(rand() % 4) };
-				switch (randDir)
+				if (rand() % 100 < 90)
 				{
-				case MovementDirection::up:
-					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::up);
-					break;
-				case MovementDirection::down:
-					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::down);
-					break;
-				case MovementDirection::left:
-					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::left);
-					break;
-				case MovementDirection::right:
-					MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::right);
-					break;
-				default:
-					break;
+					MovementDirection randDir{ MovementDirection(rand() % 4) };
+					switch (randDir)
+					{
+					case MovementDirection::up:
+						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::up);
+						break;
+					case MovementDirection::down:
+						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::down);
+						break;
+					case MovementDirection::left:
+						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::left);
+						break;
+					case MovementDirection::right:
+						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::right);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
