@@ -167,7 +167,7 @@ void MoveCharacter(Character* player, Grid& grid, MovementDirection moveDir)
 				}
 				break;
 			case MovementDirection::right:
-				if (i%4 < 3)
+				if (i % 4 < 3)
 				{
 					grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
 					grid.cells[i].pCharacter = nullptr;
@@ -176,6 +176,7 @@ void MoveCharacter(Character* player, Grid& grid, MovementDirection moveDir)
 			default:
 				break;
 			}
+			i = grid.size;
 		}
 	}
 }
