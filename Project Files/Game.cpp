@@ -233,6 +233,8 @@ void DrawGridCharacters(Grid& grid)
 {
 	for (int i = 0; i < grid.size; i++)
 	{
+		if (grid.cells[i].pCharacter == nullptr) continue;
+
 		if (grid.cells[i].pCharacter->isAlive)
 		{
 			if (grid.cells[i].pCharacter->isPlayer)
