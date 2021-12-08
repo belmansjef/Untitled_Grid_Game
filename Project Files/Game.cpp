@@ -23,15 +23,22 @@ void Start()
 void Draw()
 {
 	ClearBackground(0.5f, 0.0f, 0.7f);
+
 	DrawGrid(g_PlayerGrid);
 	DrawGrid(g_EnemyGrid);
+
+	DrawProjectilles(g_Projectilles, g_NrProjectilles);
 }
 
 void Update(float elapsedSec)
 {
-	g_UpdateTimer += elapsedSec;
-	g_SpawnTimer += elapsedSec;
+	g_DeltaTime = elapsedSec;
+
+	g_UpdateTimer += g_DeltaTime;
+	g_SpawnTimer += g_DeltaTime;
+
 	UpdateEnemies(g_Enemies, g_NrEnemies);
+	UpdateProjectilles(g_Projectilles, g_NrProjectilles);
 }
 
 void End()
@@ -152,7 +159,6 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 					if (grid.cells[i + 4].pCharacter == nullptr)
 					{
 						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
-						
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -190,8 +196,21 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			default:
 				break;
 			}
-			i = grid.size;
+			break;
 		}
+	}
+
+	for (int i = 0; i < grid.size; i++)
+	{
+		if (grid.cells[i].pCharacter != nullptr)
+		{
+			grid.cells[i].pCharacter->pos = grid.cells[i].cellPos;
+		}
+	}
+
+	if (!pCharacter->isPlayer)
+	{
+		ShootProjectille(pCharacter, g_Projectilles, g_NrProjectilles);
 	}
 }
 
@@ -241,6 +260,7 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 		}
 
 		grid.cells[index].pCharacter = &character;
+		character.pos = grid.cells[index].cellPos;
 		character.isAlive = true;
 		return;
 	}
@@ -251,6 +271,7 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 			if (grid.cells[i].pCharacter == nullptr)
 			{
 				grid.cells[i].pCharacter = &character;
+				character.pos = grid.cells[i].cellPos;
 				character.isAlive = true;
 				return;
 			}
@@ -260,7 +281,7 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 	std::cout << "Unable to spawn character" << std::endl;
 }
 
-void HitCharacter(Character& character, const float dmg)
+void DamageCharacter(Character& character, const float dmg)
 {
 
 }
@@ -270,8 +291,26 @@ void KillCharacter(Character& character, Grid& grid)
 
 }
 
-void ShootProjectille(const Cell& originCell, const MovementDirection& moveDir, Projectille* pProjectilles, const int size)
+bool IsInView(const Point2f& pos, const float size)
 {
+	return pos.x + size > 0 || pos.x - size < g_WindowWidth || pos.y + size > 0 || pos.y - size < g_WindowHeight;
+}
+
+void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!pProjectilles[i].inScene)
+		{
+			pProjectilles[i].moveDir = pCharacter->isPlayer ? MovementDirection::right : MovementDirection::left;
+			pProjectilles[i].size = 20.0f;
+			pProjectilles[i].pos.x = (pCharacter->pos.x + 212.0f) - pProjectilles[i].size / 2.0f;
+			pProjectilles[i].pos.y = (pCharacter->pos.y + 212.0f) - pProjectilles[i].size / 2.0f;
+
+			pProjectilles[i].dmg = pCharacter->dmg;
+			pProjectilles[i].inScene = true;
+		}
+	}
 }
 
 void ShootRay(const Cell& originCell, const MovementDirection& moveDir)
@@ -280,6 +319,33 @@ void ShootRay(const Cell& originCell, const MovementDirection& moveDir)
 
 void UpdateProjectilles(Projectille* pProjectilles, const int size)
 {
+	const Rectf playerRect{ g_Player.pos.x, g_Player.pos.y, 404.0f, 404.0f };
+	
+	for (int i = 0; i < size; i++)
+	{
+		if (pProjectilles[i].inScene)
+		{
+			const Rectf projectilleRect{pProjectilles[i].pos.x, pProjectilles[i].pos.y, pProjectilles[i].size, pProjectilles[i].size};
+			switch (pProjectilles[i].moveDir)
+			{
+			case MovementDirection::left:
+				pProjectilles[i].pos.x -= pProjectilles[i].speed * g_DeltaTime;
+			case MovementDirection::right:
+				pProjectilles[i].pos.x += pProjectilles[i].speed * g_DeltaTime;
+			default:
+				break;
+			}
+
+			if (IsOverlapping(playerRect, projectilleRect))
+			{
+				DamageCharacter(g_Player, pProjectilles[i].dmg);
+				pProjectilles[i].inScene = false;
+				continue;
+			}
+
+			pProjectilles[i].inScene = IsInView(pProjectilles[i].pos, pProjectilles[i].size);
+		}
+	}
 }
 
 void DrawGridCharacters(Grid& grid)
@@ -318,5 +384,17 @@ void DrawGrid(Grid& grid)
 	}
 
 	DrawGridCharacters(grid);
+}
+void DrawProjectilles(Projectille* pProjectilles, const int size)
+{
+	SetColor(1.0f, 0.1f, 0.1f);
+	for (int i = 0; i < size; i++)
+	{
+		if (pProjectilles[i].inScene)
+		{
+			const Rectf projectilleRect{ pProjectilles[i].pos.x, pProjectilles[i].pos.y, pProjectilles[i].size, pProjectilles[i].size };
+			FillRect(projectilleRect);
+		}
+	}
 }
 #pragma endregion ownDefinitions

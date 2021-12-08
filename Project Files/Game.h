@@ -9,6 +9,8 @@ float g_WindowHeight{ 720 };
 
 
 #pragma region ownDeclarations
+float g_DeltaTime{};
+
 const float g_EnemyUpdateInterval{ .5f };
 Point2f g_EnemySpawnInterval{ 2.0f, 30.0f };
 float g_UpdateTimer{};
@@ -32,10 +34,12 @@ void InitGrid(Grid& grid, const Point2f& startPos);
 void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 
 void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
-void HitCharacter(Character& character, const float dmg);
+void DamageCharacter(Character& character, const float dmg);
 void KillCharacter(Character& character, Grid& grid);
 
-void ShootProjectille(const Cell& originCell, const MovementDirection& moveDir, Projectille* pProjectilles, const int size);
+bool IsInView(const Point2f& pos, const float size);
+
+void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size);
 void ShootRay(const Cell& originCell, const MovementDirection& moveDir);
 
 void UpdateProjectilles(Projectille* pProjectilles, const int size);
@@ -44,6 +48,7 @@ void UpdateEnemies(Character* pEnemies, const int size);
 
 void DrawGridCharacters(Grid& grid);
 void DrawGrid(Grid& grid);
+void DrawProjectilles(Projectille* pProjectilles, const int size);
 #pragma endregion ownDeclarations
 
 #pragma region gameFunctions			

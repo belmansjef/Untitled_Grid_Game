@@ -492,8 +492,55 @@ namespace utils
 
 
 #pragma region CollisionFunctionality
+	float GetDistance(const float& x1, const float& y1, const float& x2, const float& y2)
+	{
+		return GetDistance(Point2f(x1, y1), Point2f(x2, y2));
+	}
 
+	float GetDistance(const Point2f& p1, const Point2f& p2)
+	{
+		const Point2f freeVector{ Point2f(p2.x - p1.x, p2.y - p1.y) };
 
+		return sqrtf(powf(freeVector.x, 2) + powf(freeVector.y, 2));
+	}
+
+	bool IsPointInCircle(const Circlef& circle, const Point2f& point)
+	{
+		return GetDistance(circle.center, point) <= circle.radius;
+	}
+
+	bool IsPointInRect(const Rectf& rect, const Point2f& point)
+	{
+		return point.x >= rect.left && point.x <= rect.left + rect.width && point.y >= rect.bottom && point.y <= rect.bottom + rect.height;
+	}
+
+	bool IsOverlapping(const Rectf& rect1, const Rectf& rect2)
+	{
+		if (rect1.left == rect1.left + rect1.width || rect1.bottom == rect1.bottom + rect1.height
+			|| rect2.left == rect2.left + rect2.width || rect2.bottom == rect2.bottom + rect2.height)
+		{
+			return false;
+		}
+
+		if (rect1.left >= rect2.left + rect2.width || rect2.left >= rect1.left + rect1.width)
+		{
+			return false;
+		}
+
+		if (rect1.bottom >= rect2.bottom + rect2.height || rect2.bottom >= rect1.bottom + rect1.height)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	bool IsOverlapping(const Circlef& circle1, const Circlef& circle2)
+	{
+		const float distance = GetDistance(circle1.center, circle2.center);
+
+		return circle1.radius - circle2.radius < distance&& distance < circle1.radius + circle2.radius;
+	}
 #pragma endregion CollisionFunctionality
 
 #pragma region OwnFunctions

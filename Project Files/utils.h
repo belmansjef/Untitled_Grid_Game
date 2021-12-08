@@ -66,7 +66,14 @@ namespace utils
 #pragma endregion TextureFunctionality
 
 #pragma region CollisionFunctionality
+	float GetDistance(const float& x1, const float& y1, const float& x2, const float& y2);
+	float GetDistance(const Point2f& p1, const Point2f& p2);
 
+	bool IsPointInCircle(const Circlef& circle, const Point2f& point);
+	bool IsPointInRect(const Rectf& rect, const Point2f& point);
+
+	bool IsOverlapping(const Rectf& rect1, const Rectf& rect2);
+	bool IsOverlapping(const Circlef& circle1, const Circlef& circle2);
 #pragma endregion CollisionFunctionality
 
 #pragma region OwnFunctions

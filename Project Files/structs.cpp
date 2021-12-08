@@ -117,12 +117,13 @@ Ellipsef::Ellipsef(const Point2f& center, float radiusX, float radiusY)
 // Grid game Constructors
 //-----------------------------------------------------------------
 Character::Character()
-	:Character{ Texture(), Texture(), 100.0f, 100.0f, 100.0f, 1.0f, false, false }
+	:Character{ Point2f(), Texture(), Texture(), 100.0f, 100.0f, 100.0f, 1.0f, false, false }
 {
 }
 
-Character::Character(const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive)
-	: characterTexture{ characterTexture }
+Character::Character(const Point2f& pos, const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive)
+	: pos{pos}
+	, characterTexture{ characterTexture }
 	, healthTexture{ healthTexture }
 	, hp{ hp }
 	, maxHP{ maxHP }
@@ -162,7 +163,7 @@ Grid::Grid(const Cell& cells, const float width, const float height, const float
 }
 
 Projectille::Projectille()
-	:Projectille{ Point2f(), MovementDirection::left, false, 1.0f, 1.0f, 1.0f }
+	:Projectille{ Point2f(), MovementDirection::left, false, 1.0f, 10.0f, 10.0f }
 {
 }
 

@@ -88,8 +88,10 @@ struct Texture
 struct Character
 {
 	Character();
-	explicit Character(const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive);
+	explicit Character(const Point2f& pos, const Texture& characterTexture, const Texture& healthTexture, const float hp, const float maxHP, const float dmg, const float dmgMultiplier, const bool isPlayer, const bool isAlive);
 	
+	Point2f pos;
+
 	Texture characterTexture;
 	Texture healthTexture;
 
