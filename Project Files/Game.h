@@ -21,6 +21,9 @@ const int g_NrEnemies{ 16 };
 Character g_Player{};
 Character g_Enemies[g_NrEnemies]{};
 
+const int g_NrProjectilles{ 50 };
+Projectille g_Projectilles[g_NrProjectilles]{};
+
 void InitPlayer(Character& player, Grid& grid);
 void InitEnemies(Character* pEnemies, const int size, Grid& grid);
 
@@ -31,6 +34,11 @@ void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
 void HitCharacter(Character& character, const float dmg);
 void KillCharacter(Character& character, Grid& grid);
+
+void ShootProjectille(const Cell& originCell, const MovementDirection& moveDir, Projectille* pProjectilles, const int size);
+void ShootRay(const Cell& originCell, const MovementDirection& moveDir);
+
+void UpdateProjectilles(Projectille* pProjectilles, const int size);
 
 void UpdateEnemies(Character* pEnemies, const int size);
 

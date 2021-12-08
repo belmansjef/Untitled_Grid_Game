@@ -141,11 +141,27 @@ enum class MovementDirection
 struct Projectille
 {
 	Projectille();
-	explicit Projectille(const Point2f& pos, const MovementDirection& moveDir, const float dmg, const float speed, const float size);
+	explicit Projectille(const Point2f& pos, const MovementDirection& moveDir, const bool inScene, const float dmg, const float speed, const float size);
 	
 	Point2f pos;
 	MovementDirection moveDir;
+
+	bool inScene;
+
 	float dmg;
 	float speed;
 	float size;
+};
+
+struct Ray
+{
+	Ray();
+	explicit Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const float dmg, const float range);
+
+	Point2f startPos;
+	MovementDirection moveDir;
+	Color4f color;
+
+	float dmg;
+	float range;
 };

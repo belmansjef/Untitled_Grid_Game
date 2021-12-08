@@ -162,15 +162,30 @@ Grid::Grid(const Cell& cells, const float width, const float height, const float
 }
 
 Projectille::Projectille()
-	:Projectille{ Point2f(), MovementDirection::left, 1.0f, 1.0f, 1.0f }
+	:Projectille{ Point2f(), MovementDirection::left, false, 1.0f, 1.0f, 1.0f }
 {
 }
 
-Projectille::Projectille(const Point2f& pos, const MovementDirection& moveDir, const float dmg, const float speed, const float size)
+Projectille::Projectille(const Point2f& pos, const MovementDirection& moveDir, const bool inScene, const float dmg, const float speed, const float size)
 	: pos{pos}
 	, moveDir{moveDir}
+	, inScene{inScene}
 	, dmg{dmg}
 	, speed{ speed }
 	, size{ size }
+{
+}
+
+Ray::Ray()
+	:Ray{ Point2f(), MovementDirection::right, Color4f(), 1.0f, 100.0f }
+{
+}
+
+Ray::Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const float dmg, const float range)
+	: startPos{startPos}
+	, moveDir{moveDir}
+	, color{color}
+	, dmg{dmg}
+	, range{range}
 {
 }

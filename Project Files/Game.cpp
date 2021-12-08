@@ -152,7 +152,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 					if (grid.cells[i + 4].pCharacter == nullptr)
 					{
 						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
-						delete grid.cells[i].pCharacter;
+						
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -163,7 +163,6 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 					if (grid.cells[i - 4].pCharacter == nullptr)
 					{
 						grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
-						delete grid.cells[i].pCharacter;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -174,7 +173,6 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 					if (grid.cells[i - 1].pCharacter == nullptr)
 					{
 						grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
-						delete grid.cells[i].pCharacter;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -205,7 +203,7 @@ void UpdateEnemies(Character* pEnemies, const int size)
 		{
 			if (pEnemies[i].isAlive)
 			{
-				if (rand() % 100 < 90)
+				if (rand() % 100 < 40)
 				{
 					MovementDirection randDir{ MovementDirection(rand() % 4) };
 					switch (randDir)
@@ -237,7 +235,7 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 	if (randomSpawn)
 	{
 		int index{ int(GenerateRandomNumber(0, grid.size - 1)) };
-		while (grid.cells[index].pCharacter->isAlive)
+		while (grid.cells[index].pCharacter != nullptr)
 		{
 			index = int(GenerateRandomNumber(0, grid.size - 1));
 		}
@@ -250,7 +248,7 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 	{
 		for (int i = 0; i < grid.size; i++)
 		{
-			if (!grid.cells[i].pCharacter->isAlive)
+			if (grid.cells[i].pCharacter == nullptr)
 			{
 				grid.cells[i].pCharacter = &character;
 				character.isAlive = true;
@@ -270,6 +268,18 @@ void HitCharacter(Character& character, const float dmg)
 void KillCharacter(Character& character, Grid& grid)
 {
 
+}
+
+void ShootProjectille(const Cell& originCell, const MovementDirection& moveDir, Projectille* pProjectilles, const int size)
+{
+}
+
+void ShootRay(const Cell& originCell, const MovementDirection& moveDir)
+{
+}
+
+void UpdateProjectilles(Projectille* pProjectilles, const int size)
+{
 }
 
 void DrawGridCharacters(Grid& grid)
