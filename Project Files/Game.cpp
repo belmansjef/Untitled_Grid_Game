@@ -134,6 +134,7 @@ void InitGrid(Grid& grid, const Point2f& startPos)
 		grid.cells[i].cellPos.x = startPos.x + ((cellSize + spacing) * (i % 4));
 		grid.cells[i].cellPos.y = startPos.y + ((cellSize + spacing) * (i / 4));
 		grid.cells[i].width = grid.cells[i].height = cellSize;
+		grid.cells[i].pCharacter = nullptr;
 	}
 }
 
@@ -148,7 +149,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::up:
 				if (i < 12)
 				{
-					if (grid.cells[i + 4].pCharacter != nullptr)
+					if (grid.cells[i + 4].pCharacter == nullptr)
 					{
 						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
 						delete grid.cells[i].pCharacter;
@@ -159,7 +160,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::down:
 				if (i > 3)
 				{
-					if (grid.cells[i - 4].pCharacter != nullptr)
+					if (grid.cells[i - 4].pCharacter == nullptr)
 					{
 						grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
 						delete grid.cells[i].pCharacter;
@@ -170,7 +171,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::left:
 				if (i % 4 > 0)
 				{
-					if (grid.cells[i - 1].pCharacter != nullptr)
+					if (grid.cells[i - 1].pCharacter == nullptr)
 					{
 						grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
 						delete grid.cells[i].pCharacter;
@@ -181,7 +182,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::right:
 				if (i % 4 < 3)
 				{
-					if (grid.cells[i + 1].pCharacter != nullptr)
+					if (grid.cells[i + 1].pCharacter == nullptr)
 					{
 						grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
 						grid.cells[i].pCharacter = nullptr;
