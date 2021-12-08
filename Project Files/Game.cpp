@@ -148,44 +148,43 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::up:
 				if (i < 12)
 				{
-					if (!grid.cells[i + 4].pCharacter->isAlive)
+					if (grid.cells[i + 4].pCharacter != nullptr)
 					{
-						Character* pHoldChar{ grid.cells[i + 4].pCharacter };
 						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
-						grid.cells[i].pCharacter = pHoldChar;
+						delete grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = nullptr;
 					}
 				}
 				break;
 			case MovementDirection::down:
 				if (i > 3)
 				{
-					if (!grid.cells[i - 4].pCharacter->isAlive)
+					if (grid.cells[i - 4].pCharacter != nullptr)
 					{
-						Character* pHoldChar{ grid.cells[i - 4].pCharacter };
 						grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
-						grid.cells[i].pCharacter = pHoldChar;
+						delete grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = nullptr;
 					}
 				}
 				break;
 			case MovementDirection::left:
 				if (i % 4 > 0)
 				{
-					if (!grid.cells[i - 1].pCharacter->isAlive)
+					if (grid.cells[i - 1].pCharacter != nullptr)
 					{
-						Character* pHoldChar{ grid.cells[i - 1].pCharacter };
 						grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
-						grid.cells[i].pCharacter = pHoldChar;
+						delete grid.cells[i].pCharacter;
+						grid.cells[i].pCharacter = nullptr;
 					}
 				}
 				break;
 			case MovementDirection::right:
 				if (i % 4 < 3)
 				{
-					if (!grid.cells[i + 1].pCharacter->isAlive)
+					if (grid.cells[i + 1].pCharacter != nullptr)
 					{
-						Character* pHoldChar{ grid.cells[i + 1].pCharacter };
 						grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
-						grid.cells[i].pCharacter = pHoldChar;
+						grid.cells[i].pCharacter = nullptr;
 					}
 				}
 				break;
