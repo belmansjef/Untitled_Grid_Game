@@ -218,6 +218,7 @@ void UpdateEnemies(Character* pEnemies, const int size)
 {
 	if (g_UpdateTimer >= g_EnemyUpdateInterval)
 	{
+		bool attemptSpawnEnemy{ false };
 		for (int i = 0; i < size; i++)
 		{
 			if (pEnemies[i].isAlive)
@@ -241,6 +242,17 @@ void UpdateEnemies(Character* pEnemies, const int size)
 						break;
 					default:
 						break;
+					}
+				}
+			}
+			if (!attemptSpawnEnemy)
+			{
+				if (!pEnemies[i].isAlive)
+				{
+					attemptSpawnEnemy = !attemptSpawnEnemy;
+					if (rand() % 100 < 6)
+					{
+						SpawnCharacter(*pEnemies, g_EnemyGrid, true);
 					}
 				}
 			}
