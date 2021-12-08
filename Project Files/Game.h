@@ -34,15 +34,15 @@ void InitGrid(Grid& grid, const Point2f& startPos);
 void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 
 void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
-void DamageCharacter(Character& character, const float dmg);
-void KillCharacter(Character& character, Grid& grid);
+void DamageCharacter(Character* pCharacter, const float dmg);
+void KillCharacter(Character* pCharacter, Grid& grid);
 
 bool IsInView(const Point2f& pos, const float size);
 
 void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size);
 void ShootRay(const Cell& originCell, const MovementDirection& moveDir);
 
-void UpdateProjectilles(Projectille* pProjectilles, const int size);
+void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec);
 
 void UpdateEnemies(Character* pEnemies, const int size);
 

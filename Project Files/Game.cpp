@@ -38,7 +38,7 @@ void Update(float elapsedSec)
 	g_SpawnTimer += g_DeltaTime;
 
 	UpdateEnemies(g_Enemies, g_NrEnemies);
-	UpdateProjectilles(g_Projectilles, g_NrProjectilles);
+	UpdateProjectilles(g_Projectilles, g_NrProjectilles, elapsedSec);
 }
 
 void End()
@@ -211,6 +211,7 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 	if (!pCharacter->isPlayer)
 	{
 		ShootProjectille(pCharacter, g_Projectilles, g_NrProjectilles);
+		std::cout << "Pew!" << std::endl;
 	}
 }
 
@@ -293,19 +294,44 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 	std::cout << "Unable to spawn character" << std::endl;
 }
 
-void DamageCharacter(Character& character, const float dmg)
+void DamageCharacter(Character* pCharacter, const float dmg)
 {
+	pCharacter->hp -= dmg;
+	if (pCharacter->hp <= 0.0f)
+	{
+		pCharacter->hp = 0.0f;
 
+		Grid grid = pCharacter->isPlayer ? g_PlayerGrid : g_EnemyGrid;
+		KillCharacter(pCharacter, grid);
+	}
+
+	std::stringstream stream{};
+	stream << std::fixed << std::setprecision(0) << pCharacter->hp;
+	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pCharacter->healthTexture);
 }
 
-void KillCharacter(Character& character, Grid& grid)
+void KillCharacter(Character* pCharacter, Grid& grid)
 {
+	if (pCharacter->isPlayer)
+	{
+		// TODO: End of round
+		return;
+	}
 
+	for (int i = 0; i < grid.size; i++)
+	{
+		if (grid.cells[i].pCharacter == pCharacter && grid.cells[i].pCharacter != nullptr)
+		{
+			grid.cells[i].pCharacter->isAlive = false;
+			grid.cells[i].pCharacter = nullptr;
+		}
+	}
+	
 }
 
 bool IsInView(const Point2f& pos, const float size)
 {
-	return pos.x + size > 0 || pos.x - size < g_WindowWidth || pos.y + size > 0 || pos.y - size < g_WindowHeight;
+	return pos.x + size > 0 && pos.x - size < g_WindowWidth&& pos.y + size > 0 && pos.y - size < g_WindowHeight;
 }
 
 void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size)
@@ -316,11 +342,14 @@ void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, c
 		{
 			pProjectilles[i].moveDir = pCharacter->isPlayer ? MovementDirection::right : MovementDirection::left;
 			pProjectilles[i].size = 20.0f;
-			pProjectilles[i].pos.x = (pCharacter->pos.x + 212.0f) - pProjectilles[i].size / 2.0f;
-			pProjectilles[i].pos.y = (pCharacter->pos.y + 212.0f) - pProjectilles[i].size / 2.0f;
+			pProjectilles[i].speed = 10.0f;
+			pProjectilles[i].pos.x = (pCharacter->pos.x + 48.0f) - pProjectilles[i].size / 2.0f;
+			pProjectilles[i].pos.y = (pCharacter->pos.y + 48.0f) - pProjectilles[i].size / 2.0f;
 
 			pProjectilles[i].dmg = pCharacter->dmg;
 			pProjectilles[i].inScene = true;
+			
+			return;
 		}
 	}
 }
@@ -329,9 +358,9 @@ void ShootRay(const Cell& originCell, const MovementDirection& moveDir)
 {
 }
 
-void UpdateProjectilles(Projectille* pProjectilles, const int size)
+void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec)
 {
-	const Rectf playerRect{ g_Player.pos.x, g_Player.pos.y, 404.0f, 404.0f };
+	const Rectf playerRect{ g_Player.pos.x, g_Player.pos.y, 80.0f, 80.0f };
 	
 	for (int i = 0; i < size; i++)
 	{
@@ -341,7 +370,7 @@ void UpdateProjectilles(Projectille* pProjectilles, const int size)
 			switch (pProjectilles[i].moveDir)
 			{
 			case MovementDirection::left:
-				pProjectilles[i].pos.x -= pProjectilles[i].speed * g_DeltaTime;
+				pProjectilles[i].pos.x -= 1.0f;
 			case MovementDirection::right:
 				pProjectilles[i].pos.x += pProjectilles[i].speed * g_DeltaTime;
 			default:
@@ -350,7 +379,7 @@ void UpdateProjectilles(Projectille* pProjectilles, const int size)
 
 			if (IsOverlapping(playerRect, projectilleRect))
 			{
-				DamageCharacter(g_Player, pProjectilles[i].dmg);
+				DamageCharacter(&g_Player, pProjectilles[i].dmg);
 				pProjectilles[i].inScene = false;
 				continue;
 			}
@@ -397,6 +426,7 @@ void DrawGrid(Grid& grid)
 
 	DrawGridCharacters(grid);
 }
+
 void DrawProjectilles(Projectille* pProjectilles, const int size)
 {
 	SetColor(1.0f, 0.1f, 0.1f);
