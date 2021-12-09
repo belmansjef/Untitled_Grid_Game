@@ -13,7 +13,7 @@ void Start()
 	// Spawn the player
 	SpawnCharacter(g_Player, g_PlayerGrid);
 
-	// Example of spawning two enemies
+	// Example of spawning three enemies
 	for (int i = 0; i < 3; i++)
 	{
 		SpawnCharacter(g_Enemies[i], g_EnemyGrid);
@@ -64,6 +64,9 @@ void OnKeyDownEvent(SDL_Keycode key)
 	case SDLK_d:
 		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::right);
 		break;
+	case SDLK_SPACE:
+		ShootRay(g_Player, MovementDirection::right);
+		break;
 	default:
 		break;
 	}
@@ -97,7 +100,7 @@ void InitPlayer(Character& player, Grid& grid)
 	player.dmgMultiplier = 1.0f;
 	player.maxHP = player.hp = 500.0f;
 	player.isPlayer = true;
-	player.isAlive = true;
+	player.isAlive = false;
 
 	std::stringstream stream{};
 	stream << std::fixed << std::setprecision(0) << player.maxHP;
@@ -211,7 +214,6 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 	if (!pCharacter->isPlayer)
 	{
 		ShootProjectille(pCharacter, g_Projectilles, g_NrProjectilles);
-		std::cout << "Pew!" << std::endl;
 	}
 }
 
@@ -305,6 +307,8 @@ void DamageCharacter(Character* pCharacter, const float dmg)
 		KillCharacter(pCharacter, grid);
 	}
 
+	DeleteTexture(pCharacter->healthTexture);
+
 	std::stringstream stream{};
 	stream << std::fixed << std::setprecision(0) << pCharacter->hp;
 	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pCharacter->healthTexture);
@@ -320,7 +324,7 @@ void KillCharacter(Character* pCharacter, Grid& grid)
 
 	for (int i = 0; i < grid.size; i++)
 	{
-		if (grid.cells[i].pCharacter == pCharacter && grid.cells[i].pCharacter != nullptr)
+		if (grid.cells[i].pCharacter == pCharacter && grid.cells[i].pCharacter)
 		{
 			grid.cells[i].pCharacter->isAlive = false;
 			grid.cells[i].pCharacter = nullptr;
@@ -354,8 +358,20 @@ void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, c
 	}
 }
 
-void ShootRay(const Cell& originCell, const MovementDirection& moveDir)
+void ShootRay(const Character& caster, const MovementDirection& moveDir)
 {
+	Ray ray{ caster.pos, moveDir, Color4f(1.0f, 0.2f, 0.2f), caster.dmg, 250.0f };
+	Grid otherGrid{ caster.isPlayer ? g_EnemyGrid : g_PlayerGrid};
+
+	for (int i = 0; i < otherGrid.size; i++)
+	{
+		Character* target{ otherGrid.cells[i].pCharacter };
+		if (target && target->pos.y == ray.startPos.y)
+		{
+			DamageCharacter(target, ray.dmg);
+			std::cout << "Hit at " << i << " !" << std::endl;
+		}
+	}
 }
 
 void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec)

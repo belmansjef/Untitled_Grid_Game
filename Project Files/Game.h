@@ -40,7 +40,7 @@ void KillCharacter(Character* pCharacter, Grid& grid);
 bool IsInView(const Point2f& pos, const float size);
 
 void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size);
-void ShootRay(const Cell& originCell, const MovementDirection& moveDir);
+void ShootRay(const Character& caster, const MovementDirection& moveDir);
 
 void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec);
 
