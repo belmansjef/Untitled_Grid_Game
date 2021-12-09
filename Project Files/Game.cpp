@@ -11,12 +11,12 @@ void Start()
 	InitEnemies(g_Enemies, g_NrEnemies, g_EnemyGrid);
 
 	// Spawn the player
-	SpawnCharacter(g_Player, g_PlayerGrid);
+	SpawnCharacter(&g_Player, g_PlayerGrid);
 
 	// Example of spawning three enemies
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		SpawnCharacter(g_Enemies[i], g_EnemyGrid);
+		SpawnCharacter(&g_Enemies[i], g_EnemyGrid);
 	}
 }
 
@@ -28,6 +28,7 @@ void Draw()
 	DrawGrid(g_EnemyGrid);
 
 	DrawProjectilles(g_Projectilles, g_NrProjectilles);
+	DrawRays(g_Rays, g_NrRays);
 }
 
 void Update(float elapsedSec)
@@ -35,10 +36,11 @@ void Update(float elapsedSec)
 	g_DeltaTime = elapsedSec;
 
 	g_UpdateTimer += g_DeltaTime;
-	g_SpawnTimer += g_DeltaTime;
+	g_SpawnTimer -= g_DeltaTime;
 
 	UpdateEnemies(g_Enemies, g_NrEnemies);
-	UpdateProjectilles(g_Projectilles, g_NrProjectilles, elapsedSec);
+	SpawnEnemy(g_Enemies, g_NrEnemies);
+	UpdateProjectilles(g_Projectilles, g_NrProjectilles);
 }
 
 void End()
@@ -102,9 +104,7 @@ void InitPlayer(Character& player, Grid& grid)
 	player.isPlayer = true;
 	player.isAlive = false;
 
-	std::stringstream stream{};
-	stream << std::fixed << std::setprecision(0) << player.maxHP;
-	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), player.healthTexture);
+	UpdateCharacterHealthTexture(&player);
 
 	const Point2f startPos{ (g_WindowWidth / 2.0f) - (grid.width + 25.0f), (g_WindowHeight - grid.height) / 2.0f };
 	InitGrid(grid, startPos);
@@ -120,9 +120,7 @@ void InitEnemies(Character* pEnemies, const int size, Grid& grid)
 		pEnemies[i].isPlayer = false;
 		pEnemies[i].isAlive = false;
 
-		std::stringstream stream{};
-		stream << std::fixed << std::setprecision(0) << pEnemies[i].maxHP;
-		TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pEnemies[i].healthTexture);
+		UpdateCharacterHealthTexture(&pEnemies[i]);
 	}
 
 	const Point2f startPos{ (g_WindowWidth / 2.0f) + 25.0f, (g_WindowHeight - grid.height) / 2.0f };
@@ -159,9 +157,10 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::up:
 				if (i < 12)
 				{
-					if (grid.cells[i + 4].pCharacter == nullptr)
+					if (!grid.cells[i + 4].pCharacter)
 					{
 						grid.cells[i + 4].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i + 4].pCharacter->pos = grid.cells[i + 4].cellPos;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -169,9 +168,10 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::down:
 				if (i > 3)
 				{
-					if (grid.cells[i - 4].pCharacter == nullptr)
+					if (!grid.cells[i - 4].pCharacter)
 					{
 						grid.cells[i - 4].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i - 4].pCharacter->pos = grid.cells[i - 4].cellPos;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -179,9 +179,10 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::left:
 				if (i % 4 > 0)
 				{
-					if (grid.cells[i - 1].pCharacter == nullptr)
+					if (!grid.cells[i - 1].pCharacter)
 					{
 						grid.cells[i - 1].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i - 1].pCharacter->pos = grid.cells[i - 1].cellPos;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -189,9 +190,10 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			case MovementDirection::right:
 				if (i % 4 < 3)
 				{
-					if (grid.cells[i + 1].pCharacter == nullptr)
+					if (!grid.cells[i + 1].pCharacter)
 					{
 						grid.cells[i + 1].pCharacter = grid.cells[i].pCharacter;
+						grid.cells[i + 1].pCharacter->pos = grid.cells[i + 1].cellPos;
 						grid.cells[i].pCharacter = nullptr;
 					}
 				}
@@ -202,81 +204,78 @@ void MoveCharacter(Character* pCharacter, Grid& grid, MovementDirection moveDir)
 			break;
 		}
 	}
-
-	for (int i = 0; i < grid.size; i++)
-	{
-		if (grid.cells[i].pCharacter != nullptr)
-		{
-			grid.cells[i].pCharacter->pos = grid.cells[i].cellPos;
-		}
-	}
-
-	if (!pCharacter->isPlayer)
-	{
-		ShootProjectille(pCharacter, g_Projectilles, g_NrProjectilles);
-	}
 }
 
 void UpdateEnemies(Character* pEnemies, const int size)
 {
 	if (g_UpdateTimer >= g_EnemyUpdateInterval)
 	{
-		bool attemptSpawnEnemy{ false };
 		for (int i = 0; i < size; i++)
 		{
-			if (pEnemies[i].isAlive)
+			if (pEnemies[i].isAlive && rand() % 100 < 40)
 			{
-				if (rand() % 100 < 40)
-				{
-					MovementDirection randDir{ MovementDirection(rand() % 4) };
-					switch (randDir)
-					{
-					case MovementDirection::up:
-						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::up);
-						break;
-					case MovementDirection::down:
-						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::down);
-						break;
-					case MovementDirection::left:
-						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::left);
-						break;
-					case MovementDirection::right:
-						MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection::right);
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			if (!attemptSpawnEnemy)
-			{
-				if (!pEnemies[i].isAlive)
-				{
-					attemptSpawnEnemy = !attemptSpawnEnemy;
-					if (rand() % 100 < 6)
-					{
-						SpawnCharacter(*pEnemies, g_EnemyGrid, true);
-					}
-				}
+				MoveCharacter(&pEnemies[i], g_EnemyGrid, MovementDirection(rand() % 4));
 			}
 		}
+
 		g_UpdateTimer = 0.0f;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		if (pEnemies[i].isAlive && GenerateRandomNumber(0.0f, 100.0f) < 0.15f)
+		{
+			ShootProjectille(&pEnemies[i], g_Projectilles, g_NrProjectilles);
+		}
 	}
 }
 
-void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
+void SpawnEnemy(Character* pEnemies, const int size)
+{
+	int nrEnemiesToSpawn{ int(GenerateRandomNumber(2, 3)) };
+
+	if (g_SpawnTimer <= 0.0f)
+	{
+		g_SpawnTimer = GenerateRandomNumber(g_EnemySpawnInterval.x, g_EnemySpawnInterval.y);
+
+		for (int i = 0; i < size; i++)
+		{
+			if (!pEnemies[i].isAlive)
+			{
+				SpawnCharacter(&pEnemies[i], g_EnemyGrid, true);
+
+				--nrEnemiesToSpawn;
+
+				if(nrEnemiesToSpawn <= 0) return;
+			}
+		}
+	}
+}
+
+void UpdateCharacterHealthTexture(Character* pCharacter)
+{
+	DeleteTexture(pCharacter->healthTexture);
+	std::stringstream stream{};
+	stream << std::fixed << std::setprecision(0) << pCharacter->hp;
+	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pCharacter->healthTexture);
+}
+
+void SpawnCharacter(Character* pCharacter, Grid& grid, bool randomSpawn)
 {
 	if (randomSpawn)
 	{
 		int index{ int(GenerateRandomNumber(0, grid.size - 1)) };
-		while (grid.cells[index].pCharacter != nullptr)
+		while (grid.cells[index].pCharacter)
 		{
 			index = int(GenerateRandomNumber(0, grid.size - 1));
 		}
 
-		grid.cells[index].pCharacter = &character;
-		character.pos = grid.cells[index].cellPos;
-		character.isAlive = true;
+		grid.cells[index].pCharacter = pCharacter;
+		pCharacter->pos = grid.cells[index].cellPos;
+		pCharacter->isAlive = true;
+		pCharacter->hp = pCharacter->maxHP;
+
+		UpdateCharacterHealthTexture(pCharacter);
 		return;
 	}
 	else
@@ -285,9 +284,12 @@ void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn)
 		{
 			if (grid.cells[i].pCharacter == nullptr)
 			{
-				grid.cells[i].pCharacter = &character;
-				character.pos = grid.cells[i].cellPos;
-				character.isAlive = true;
+				grid.cells[i].pCharacter = pCharacter;
+				pCharacter->pos = grid.cells[i].cellPos;
+				pCharacter->isAlive = true;
+				pCharacter->hp = pCharacter->maxHP;
+
+				UpdateCharacterHealthTexture(pCharacter);
 				return;
 			}
 		}
@@ -303,15 +305,11 @@ void DamageCharacter(Character* pCharacter, const float dmg)
 	{
 		pCharacter->hp = 0.0f;
 
-		Grid grid = pCharacter->isPlayer ? g_PlayerGrid : g_EnemyGrid;
-		KillCharacter(pCharacter, grid);
+		Grid* pGrid = pCharacter->isPlayer ? &g_PlayerGrid : &g_EnemyGrid;
+		KillCharacter(pCharacter, *pGrid);
 	}
 
-	DeleteTexture(pCharacter->healthTexture);
-
-	std::stringstream stream{};
-	stream << std::fixed << std::setprecision(0) << pCharacter->hp;
-	TextureFromString(stream.str(), "resources/LEMONMILK-Medium.otf", 24, Color4f(0.0f, 0.0f, 0.0f), pCharacter->healthTexture);
+	UpdateCharacterHealthTexture(pCharacter);
 }
 
 void KillCharacter(Character* pCharacter, Grid& grid)
@@ -326,8 +324,9 @@ void KillCharacter(Character* pCharacter, Grid& grid)
 	{
 		if (grid.cells[i].pCharacter == pCharacter && grid.cells[i].pCharacter)
 		{
-			grid.cells[i].pCharacter->isAlive = false;
+			pCharacter->isAlive = false;
 			grid.cells[i].pCharacter = nullptr;
+			return;
 		}
 	}
 	
@@ -360,21 +359,59 @@ void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, c
 
 void ShootRay(const Character& caster, const MovementDirection& moveDir)
 {
-	Ray ray{ caster.pos, moveDir, Color4f(1.0f, 0.2f, 0.2f), caster.dmg, 250.0f };
-	Grid otherGrid{ caster.isPlayer ? g_EnemyGrid : g_PlayerGrid};
+	Ray ray{ caster.pos, moveDir, Color4f(1.0f, 0.2f, 0.2f), Rectf(), 0.1f, caster.dmg, 1000.0f };
+	Rectf rayGraphic{ ray.startPos.x + 48.0f, ray.startPos.y + 48.0f, ray.range, 5.0f };
+	Grid* pTargetGrid{ caster.isPlayer ? &g_EnemyGrid : &g_PlayerGrid};
 
-	for (int i = 0; i < otherGrid.size; i++)
+	ray.graphic = rayGraphic;
+
+	for (int i = 0; i < pTargetGrid->size; i++)
 	{
-		Character* target{ otherGrid.cells[i].pCharacter };
-		if (target && target->pos.y == ray.startPos.y)
+		Character* pTarget{ pTargetGrid->cells[i].pCharacter };
+
+		if (pTarget && pTarget->pos.y == ray.startPos.y && GetDistance(ray.startPos, pTarget->pos) <= ray.range)
 		{
-			DamageCharacter(target, ray.dmg);
-			std::cout << "Hit at " << i << " !" << std::endl;
+			ray.graphic.width = GetDistance(ray.startPos, pTarget->pos);
+			AddRay(&ray);
+
+			DamageCharacter(pTarget, ray.dmg);
+			return;
+		}
+	}
+
+	AddRay(&ray);
+}
+
+void AddRay(const Ray* pRay)
+{
+	for (int i = 0; i < g_NrRays; i++)
+	{
+		if (g_Rays[i].duration <= 0.0f)
+		{
+			g_Rays[i] = *pRay;
+			return;
 		}
 	}
 }
 
-void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec)
+void DrawRays(Ray* pRays, const int size)
+{
+	SetColor(1.0f, 0.2f, 0.2f);
+	
+	for (int i = 0; i < size; i++)
+	{
+		if (pRays[i].duration <= 0.0f) continue;
+
+		FillRect(pRays[i].graphic);
+		pRays[i].duration -= g_DeltaTime;
+		if (pRays[i].duration <= 0.0f)
+		{
+			pRays[i].duration = 0.0f;
+		}
+	}
+}
+
+void UpdateProjectilles(Projectille* pProjectilles, const int size)
 {
 	const Rectf playerRect{ g_Player.pos.x, g_Player.pos.y, 80.0f, 80.0f };
 	
@@ -383,6 +420,7 @@ void UpdateProjectilles(Projectille* pProjectilles, const int size, const float 
 		if (pProjectilles[i].inScene)
 		{
 			const Rectf projectilleRect{pProjectilles[i].pos.x, pProjectilles[i].pos.y, pProjectilles[i].size, pProjectilles[i].size};
+
 			switch (pProjectilles[i].moveDir)
 			{
 			case MovementDirection::left:
@@ -409,9 +447,7 @@ void DrawGridCharacters(Grid& grid)
 {
 	for (int i = 0; i < grid.size; i++)
 	{
-		if (grid.cells[i].pCharacter == nullptr) continue;
-
-		if (grid.cells[i].pCharacter->isAlive)
+		if (grid.cells[i].pCharacter)
 		{
 			if (grid.cells[i].pCharacter->isPlayer)
 			{

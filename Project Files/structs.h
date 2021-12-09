@@ -158,11 +158,14 @@ struct Projectille
 struct Ray
 {
 	Ray();
-	explicit Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const float dmg, const float range);
+	explicit Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const Rectf& graphic, const float duration, const float dmg, const float range);
 
 	Point2f startPos;
 	MovementDirection moveDir;
 	Color4f color;
+
+	Rectf graphic;
+	float duration;
 
 	float dmg;
 	float range;

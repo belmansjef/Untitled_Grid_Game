@@ -11,10 +11,13 @@ float g_WindowHeight{ 720 };
 #pragma region ownDeclarations
 float g_DeltaTime{};
 
-const float g_EnemyUpdateInterval{ .5f };
-Point2f g_EnemySpawnInterval{ 2.0f, 30.0f };
-float g_UpdateTimer{};
-float g_SpawnTimer{};
+const float g_EnemyUpdateInterval{ .75f };
+Point2f g_EnemySpawnInterval{ 1.0f, 4.5f };
+float g_UpdateTimer{ 0.0f };
+float g_SpawnTimer{ GenerateRandomNumber(g_EnemySpawnInterval.x, g_EnemySpawnInterval.y)};
+
+const int g_NrRays{ 255 };
+Ray g_Rays[g_NrRays]{};
 
 Grid g_PlayerGrid{};
 Grid g_EnemyGrid{};
@@ -33,18 +36,23 @@ void InitGrid(Grid& grid, const Point2f& startPos);
 
 void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 
-void SpawnCharacter(Character& character, Grid& grid, bool randomSpawn = true);
+void SpawnCharacter(Character* pCharacter, Grid& grid, bool randomSpawn = true);
 void DamageCharacter(Character* pCharacter, const float dmg);
 void KillCharacter(Character* pCharacter, Grid& grid);
 
 bool IsInView(const Point2f& pos, const float size);
 
 void ShootProjectille(const Character* pCharacter, Projectille* pProjectilles, const int size);
-void ShootRay(const Character& caster, const MovementDirection& moveDir);
 
-void UpdateProjectilles(Projectille* pProjectilles, const int size, const float elapsedSec);
+void ShootRay(const Character& caster, const MovementDirection& moveDir);
+void AddRay(const Ray* pRay);
+void DrawRays(Ray* pRays, const int size);
+
+void UpdateProjectilles(Projectille* pProjectilles, const int size);
 
 void UpdateEnemies(Character* pEnemies, const int size);
+void SpawnEnemy(Character* pEnemies, const int size);
+void UpdateCharacterHealthTexture(Character* pCharacter);
 
 void DrawGridCharacters(Grid& grid);
 void DrawGrid(Grid& grid);

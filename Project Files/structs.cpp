@@ -178,14 +178,16 @@ Projectille::Projectille(const Point2f& pos, const MovementDirection& moveDir, c
 }
 
 Ray::Ray()
-	:Ray{ Point2f(), MovementDirection::right, Color4f(), 1.0f, 100.0f }
+	:Ray{ Point2f(), MovementDirection::right, Color4f(), Rectf(), 0.0f, 1.0f, 100.0f }
 {
 }
 
-Ray::Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const float dmg, const float range)
+Ray::Ray(const Point2f& startPos, const MovementDirection& moveDir, const Color4f& color, const Rectf& graphic, const float duration, const float dmg, const float range)
 	: startPos{startPos}
 	, moveDir{moveDir}
 	, color{color}
+	, graphic{graphic}
+	, duration{duration}
 	, dmg{dmg}
 	, range{range}
 {
