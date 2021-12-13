@@ -8,6 +8,9 @@
 void Start()
 {
 	InitStartConfig();
+	TextureFromString("Untitled grid game", "resources/LEMONMILK-Medium.otf", 40, Color4f(0.f, 0.f, 0.f), g_StartGameText);
+	TextureFromString("Game Over", "resources/LEMONMILK-Medium.otf", 40, Color4f(0.f, 0.f, 0.f), g_GameOverText);
+	TextureFromString("Press G to play", "resources/LEMONMILK-Medium.otf", 40, Color4f(0.f, 0.f, 0.f), g_InstructionText);
 }
 
 void Draw()
@@ -23,11 +26,11 @@ void Draw()
 	}
 	if (g_GameState == GameState::Start)
 	{
-
+		DrawStartScreen();
 	}
 	if (g_GameState == GameState::GameOver)
 	{
-		
+		DrawGameOverScreen();
 	}
 }
 
@@ -48,7 +51,9 @@ void Update(float elapsedSec)
 
 void End()
 {
-
+	DeleteTexture(g_StartGameText);
+	DeleteTexture(g_GameOverText);
+	DeleteTexture(g_InstructionText);
 }
 #pragma endregion gameFunctions
 
@@ -492,12 +497,14 @@ void UpdateProjectilles(Projectille* pProjectilles, const int size)
 
 void DrawStartScreen()
 {
-
+	DrawTexture(g_StartGameText, Point2f(360, g_WindowHeight / 2));
+	DrawTexture(g_InstructionText, Point2f(410, g_WindowHeight / 3));
 }
 
 void DrawGameOverScreen()
 {
-
+	DrawTexture(g_GameOverText, Point2f(460, g_WindowHeight / 2));
+	DrawTexture(g_InstructionText, Point2f(410, g_WindowHeight / 3));
 }
 
 void DrawGridCharacters(Grid& grid)

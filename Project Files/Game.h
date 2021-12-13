@@ -18,6 +18,10 @@ enum class GameState
 };
 GameState g_GameState{ GameState::Start };
 
+Texture g_StartGameText{};
+Texture g_GameOverText{};
+Texture g_InstructionText{};
+
 const float g_EnemyUpdateInterval{ .75f };
 Point2f g_EnemySpawnInterval{ 1.0f, 4.5f };
 float g_UpdateTimer{ 0.0f };
