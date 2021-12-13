@@ -10,6 +10,13 @@ float g_WindowHeight{ 720 };
 
 #pragma region ownDeclarations
 float g_DeltaTime{};
+enum class GameState
+{
+	Start
+	,Active
+	,GameOver
+};
+GameState g_GameState{ GameState::Start };
 
 const float g_EnemyUpdateInterval{ .75f };
 Point2f g_EnemySpawnInterval{ 1.0f, 4.5f };
@@ -34,6 +41,8 @@ void InitEnemies(Character* pEnemies, const int size, Grid& grid);
 
 void InitGrid(Grid& grid, const Point2f& startPos);
 
+void InitStartConfig();
+
 void MoveCharacter(Character* character, Grid& grid, MovementDirection moveDir);
 
 void SpawnCharacter(Character* pCharacter, Grid& grid, bool randomSpawn = true);
@@ -54,6 +63,8 @@ void UpdateEnemies(Character* pEnemies, const int size);
 void SpawnEnemy(Character* pEnemies, const int size);
 void UpdateCharacterHealthTexture(Character* pCharacter);
 
+void DrawStartScreen();
+void DrawGameOverScreen();
 void DrawGridCharacters(Grid& grid);
 void DrawGrid(Grid& grid);
 void DrawProjectilles(Projectille* pProjectilles, const int size);

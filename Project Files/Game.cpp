@@ -7,40 +7,43 @@
 #pragma region gameFunctions
 void Start()
 {
-	InitPlayer(g_Player, g_PlayerGrid);
-	InitEnemies(g_Enemies, g_NrEnemies, g_EnemyGrid);
-
-	// Spawn the player
-	SpawnCharacter(&g_Player, g_PlayerGrid);
-
-	// Example of spawning three enemies
-	for (int i = 0; i < 2; i++)
-	{
-		SpawnCharacter(&g_Enemies[i], g_EnemyGrid);
-	}
+	InitStartConfig();
 }
 
 void Draw()
 {
 	ClearBackground(0.5f, 0.0f, 0.7f);
+	if (g_GameState == GameState::Active)
+	{
+		DrawGrid(g_PlayerGrid);
+		DrawGrid(g_EnemyGrid);
 
-	DrawGrid(g_PlayerGrid);
-	DrawGrid(g_EnemyGrid);
+		DrawProjectilles(g_Projectilles, g_NrProjectilles);
+		DrawRays(g_Rays, g_NrRays);
+	}
+	if (g_GameState == GameState::Start)
+	{
 
-	DrawProjectilles(g_Projectilles, g_NrProjectilles);
-	DrawRays(g_Rays, g_NrRays);
+	}
+	if (g_GameState == GameState::GameOver)
+	{
+		
+	}
 }
 
 void Update(float elapsedSec)
 {
-	g_DeltaTime = elapsedSec;
+	if (g_GameState == GameState::Active)
+	{
+		g_DeltaTime = elapsedSec;
 
-	g_UpdateTimer += g_DeltaTime;
-	g_SpawnTimer -= g_DeltaTime;
+		g_UpdateTimer += g_DeltaTime;
+		g_SpawnTimer -= g_DeltaTime;
 
-	UpdateEnemies(g_Enemies, g_NrEnemies);
-	SpawnEnemy(g_Enemies, g_NrEnemies);
-	UpdateProjectilles(g_Projectilles, g_NrProjectilles);
+		UpdateEnemies(g_Enemies, g_NrEnemies);
+		SpawnEnemy(g_Enemies, g_NrEnemies);
+		UpdateProjectilles(g_Projectilles, g_NrProjectilles);
+	}
 }
 
 void End()
@@ -55,19 +58,41 @@ void OnKeyDownEvent(SDL_Keycode key)
 	switch (key)
 	{
 	case SDLK_w:
-		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::up);
+		if (g_GameState == GameState::Active)
+		{
+			MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::up);
+		}
 		break;
 	case SDLK_a:
-		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::left );
+		if (g_GameState == GameState::Active)
+		{
+			MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::left );
+		}
 		break;
 	case SDLK_s:
-		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::down);
+		if (g_GameState == GameState::Active)
+		{
+			MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::down);
+		}
 		break;
 	case SDLK_d:
-		MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::right);
+		if (g_GameState == GameState::Active)
+		{
+			MoveCharacter(&g_Player, g_PlayerGrid, MovementDirection::right);
+		}
 		break;
 	case SDLK_SPACE:
-		ShootRay(g_Player, MovementDirection::right);
+		if (g_GameState == GameState::Active)
+		{
+			ShootRay(g_Player, MovementDirection::right);
+		}
+		break;
+	case SDLK_g:
+		if (g_GameState == GameState::Start || g_GameState == GameState::GameOver)
+		{
+			InitStartConfig();
+			g_GameState = GameState::Active;
+		}
 		break;
 	default:
 		break;
@@ -143,6 +168,28 @@ void InitGrid(Grid& grid, const Point2f& startPos)
 		grid.cells[i].cellPos.y = startPos.y + ((cellSize + spacing) * (i / 4));
 		grid.cells[i].width = grid.cells[i].height = cellSize;
 		grid.cells[i].pCharacter = nullptr;
+	}
+}
+
+void InitStartConfig()
+{
+	InitPlayer(g_Player, g_PlayerGrid);
+	InitEnemies(g_Enemies, g_NrEnemies, g_EnemyGrid);
+
+	// Spawn the player
+	SpawnCharacter(&g_Player, g_PlayerGrid);
+
+	// Example of spawning three enemies
+	for (int i = 0; i < 2; i++)
+	{
+		SpawnCharacter(&g_Enemies[i], g_EnemyGrid);
+	}
+	if (g_GameState == GameState::GameOver)
+	{
+		for (int i = 0; i < g_NrProjectilles; i++)
+		{
+			g_Projectilles[i].inScene = false;
+		}
 	}
 }
 
@@ -316,7 +363,7 @@ void KillCharacter(Character* pCharacter, Grid& grid)
 {
 	if (pCharacter->isPlayer)
 	{
-		// TODO: End of round
+		g_GameState = GameState::GameOver;
 		return;
 	}
 
@@ -441,6 +488,16 @@ void UpdateProjectilles(Projectille* pProjectilles, const int size)
 			pProjectilles[i].inScene = IsInView(pProjectilles[i].pos, pProjectilles[i].size);
 		}
 	}
+}
+
+void DrawStartScreen()
+{
+
+}
+
+void DrawGameOverScreen()
+{
+
 }
 
 void DrawGridCharacters(Grid& grid)
